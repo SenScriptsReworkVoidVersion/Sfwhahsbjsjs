@@ -405,7 +405,7 @@ tabButton.ZIndex = 2
 tabButton.Font = Enum.Font.Bangers
 tabButton.Text = "Test tab"
 tabButton.TextColor3 = Color3.new(0.784314, 0.784314, 0.784314)
-tabButton.TextSize = 20
+tabButton.TextSize = 16
 
 textButtonRoundify4px_2.Name = "TextButton_Roundify_4px"
 textButtonRoundify4px_2.Parent = tabButton
