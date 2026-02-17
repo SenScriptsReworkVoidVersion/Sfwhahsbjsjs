@@ -848,6 +848,36 @@ local function Resize(part, new, _delay)
 	tween:Play()
 end
 
+local function applyGradient(frame, colors, transparency)
+	transparency = transparency or 0
+	
+	-- Remove old gradient if exists
+	for i, v in pairs(frame:GetChildren()) do
+		if v:IsA("UIGradient") then
+			v:Destroy()
+		end
+	end
+	
+	-- Create new gradient
+	local gradient = Instance.new("UIGradient")
+	gradient.Parent = frame
+	
+	-- Build color sequence from colors table
+	local colorSequence = {}
+	for i, color in ipairs(colors) do
+		table.insert(colorSequence, ColorSequenceKeypoint.new((i - 1) / (#colors - 1), color))
+	end
+	
+	gradient.Color = ColorSequence.new(colorSequence)
+	
+	-- Apply transparency if the frame supports it
+	if transparency and transparency > 0 then
+		frame.BackgroundTransparency = transparency
+	end
+	
+	return gradient
+end
+
 local function rgbtohsv(r, g, b) -- idk who made this function, but thanks
 	r, g, b = r / 255, g / 255, b / 255
 	local max, min = math.max(r, g, b), math.min(r, g, b)
@@ -956,8 +986,20 @@ function library:AddWindow(title, options)
 	windows = windows + 1
 	local dropdown_open = false
 	title = tostring(title or "New Window")
-	options = (typeof(options) == "table") and options or ui_options
-	options.tween_time = 0.1
+	
+	-- Merge options with defaults
+	options = (typeof(options) == "table") and options or {}
+	options = {
+		title_bar = options.title_bar or ui_options.title_bar,
+		title_bar_transparency = options.title_bar_transparency or ui_options.title_bar_transparency,
+		background = options.background or ui_options.background,
+		background_transparency = options.background_transparency or ui_options.background_transparency,
+		main_color = options.main_color or ui_options.main_color,
+		min_size = options.min_size or ui_options.min_size,
+		toggle_key = options.toggle_key or ui_options.toggle_key,
+		can_resize = options.can_resize ~= false,
+		tween_time = 0.1,
+	}
 
 	local Window = prefabs:FindFirstChild("Window"):Clone()
 	Window.Parent = windowsFrame
@@ -965,17 +1007,24 @@ function library:AddWindow(title, options)
 	Window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
 	Window.ZIndex = Window.ZIndex + (windows * 10)
 
-	do -- Altering Window Color
+		do -- Altering Window Color
 		local Title = Window:FindFirstChild("Title")
 		local Bar = Window:FindFirstChild("Bar")
 		local Base = Bar:FindFirstChild("Base")
 		local Top = Bar:FindFirstChild("Top")
+		local Tabs = Window:FindFirstChild("Tabs")
 		local SplitFrame = Window:FindFirstChild("TabSelection"):FindFirstChild("Frame")
 		local Toggle = Bar:FindFirstChild("Toggle")
 
+		-- Apply title bar gradient
+		applyGradient(Bar, options.title_bar, options.title_bar_transparency)
+		applyGradient(Top, options.title_bar, options.title_bar_transparency)
+		
+		-- Apply background gradient
+		applyGradient(Tabs, options.background, options.background_transparency)
+
 		spawn(function()
 			while true do
-				Bar.BackgroundColor3 = options.main_color
 				Base.BackgroundColor3 = options.main_color
 				Base.ImageColor3 = options.main_color
 				Top.ImageColor3 = options.main_color
