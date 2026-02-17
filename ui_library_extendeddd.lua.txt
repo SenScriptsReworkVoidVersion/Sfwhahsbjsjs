@@ -1,4 +1,8 @@
 local ui_options = {
+	title_bar = {Color3.fromRGB(41, 74, 122), Color3.fromRGB(30, 54, 90), Color3.fromRGB(20, 36, 60)},
+	title_bar_transparency = 0.1,
+	background = {Color3.fromRGB(13, 13, 18), Color3.fromRGB(20, 20, 28), Color3.fromRGB(25, 25, 35)},
+	background_transparency = 0.05,
 	main_color = Color3.fromRGB(41, 74, 122),
 	min_size = Vector2.new(400, 300),
 	toggle_key = Enum.KeyCode.RightShift,
